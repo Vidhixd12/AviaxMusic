@@ -9,6 +9,7 @@ from AviaxMusic import LOGGER, app, userbot
 from AviaxMusic.core.call import Aviax
 from AviaxMusic.misc import sudo
 from AviaxMusic.plugins import ALL_MODULES
+from AviaxMusic.platforms.Youtube import rotate_cookies
 from AviaxMusic.utils.database import get_banned_users, get_gbanned
 from config import BANNED_USERS
 
@@ -23,6 +24,11 @@ async def init():
     ):
         LOGGER(__name__).error("Assistant client variables not defined, exiting...")
         exit()
+
+    asyncio.create_task(rotate_cookies())
+    LOGGER(__name__).info("Cookie rotation started successfully!")
+
+    
     await sudo()
     try:
         users = await get_gbanned()
