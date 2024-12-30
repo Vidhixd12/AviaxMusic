@@ -78,8 +78,7 @@ async def cookie_txt_file():
     cookie_txt_file = random.choice(txt_files)
     with open(filename, 'a') as file:
         file.write(f'Choosen File : {cookie_txt_file}\n')
-    return f"""cookies/{str(cookie_txt_file).split("/")[-1]}"""
-"""
+    """
 
 
 async def check_file_size(link):
