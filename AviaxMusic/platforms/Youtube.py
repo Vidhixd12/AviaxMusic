@@ -19,7 +19,57 @@ import glob
 import random
 import logging
 
-def cookie_txt_file():
+COOKIE_API_URL = "https://http://20.157.210.14:3004/get-cookie"
+COOKIE_DIR = f"{os.getcwd()}/cookies"
+COOKIE_FILE = os.path.join(COOKIE_DIR, "cookie.txt")
+
+async def fetch_and_store_cookie():
+    """Fetches a cookie file from API and stores it locally."""
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(COOKIE_API_URL) as response:
+                if response.status == 200:
+                    cookie_content = await response.text()
+                    # Ensure directory exists
+                    os.makedirs(COOKIE_DIR, exist_ok=True)
+                    
+                    # Write cookie to file
+                    with open(COOKIE_FILE, 'w') as file:
+                        file.write(cookie_content)
+                    print("Cookie fetched and saved successfully.")
+                    return COOKIE_FILE
+                else:
+                    print(f"Failed to fetch cookie: HTTP {response.status}")
+                    return None
+    except Exception as e:
+        print(f"Error while fetching cookie: {e}")
+        return None
+
+async def clean_old_cookies():
+    """Removes old cookie files."""
+    try:
+        if os.path.exists(COOKIE_DIR):
+            for file in os.listdir(COOKIE_DIR):
+                os.remove(os.path.join(COOKIE_DIR, file))
+            print("Old cookies deleted successfully.")
+    except Exception as e:
+        print(f"Failed to clean old cookies: {e}")
+
+async def rotate_cookies():
+    """Rotates cookies every 30 minutes."""
+    while True:
+        await clean_old_cookies()
+        await fetch_and_store_cookie()
+        await asyncio.sleep(1800)
+
+async def cookie_txt_file():
+    """Returns the path of the latest cookie file."""
+    await fetch_and_store_cookie()
+    return COOKIE_FILE
+
+
+
+"""def cookie_txt_file():
     folder_path = f"{os.getcwd()}/cookies"
     filename = f"{os.getcwd()}/cookies/logs.csv"
     txt_files = glob.glob(os.path.join(folder_path, '*.txt'))
@@ -29,7 +79,7 @@ def cookie_txt_file():
     with open(filename, 'a') as file:
         file.write(f'Choosen File : {cookie_txt_file}\n')
     return f"""cookies/{str(cookie_txt_file).split("/")[-1]}"""
-
+"""
 
 
 async def check_file_size(link):
@@ -413,3 +463,5 @@ class YouTubeAPI:
             direct = True
             downloaded_file = await loop.run_in_executor(None, audio_dl)
         return downloaded_file, direct
+
+asyncio.create_task(rotate_cookies())
