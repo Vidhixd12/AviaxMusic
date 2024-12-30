@@ -25,27 +25,43 @@ COOKIE_DIR = f"{os.getcwd()}/cookies"
 COOKIE_FILE = os.path.join(COOKIE_DIR, "cookie.txt")
 
 async def fetch_and_store_cookie():
-    """Fetches a cookie file from API and stores it locally."""
+    """Fetches a cookie file from API and stores it locally with its actual filename."""
     try:
+        # Ensure the cookies directory exists
+        os.makedirs(COOKIE_DIR, exist_ok=True)
+
         async with aiohttp.ClientSession() as session:
             async with session.get(COOKIE_API_URL) as response:
                 if response.status == 200:
+                    # Extract filename from Content-Disposition header
+                    content_disposition = response.headers.get("Content-Disposition")
+                    if content_disposition and 'filename=' in content_disposition:
+                        # Get the filename from header
+                        filename = content_disposition.split("filename=")[1].strip('"')
+                    else:
+                        # Default filename if no header is present
+                        filename = "cookie_api.txt"
+
+                    # Save the file in the cookies directory
+                    cookie_file_path = os.path.join(COOKIE_DIR, filename)
+
+                    # Write the fetched cookie content
                     cookie_content = await response.text()
-                    # Ensure directory exists
-                    os.makedirs(COOKIE_DIR, exist_ok=True)
-                    
-                    # Write cookie to file
-                    with open(COOKIE_FILE, 'w') as file:
+                    with open(cookie_file_path, 'w') as file:
                         file.write(cookie_content)
-                    print("Cookie fetched and saved successfully.")
-                    return COOKIE_FILE
+
+                    print(f"Cookie fetched and saved successfully as: {filename}")
+
+                    # Return the path of the saved file
+                    return cookie_file_path
                 else:
                     print(f"Failed to fetch cookie: HTTP {response.status}")
                     return None
+
     except Exception as e:
         print(f"Error while fetching cookie: {e}")
         return None
-
+        
 async def clean_old_cookies():
     """Removes old cookie files."""
     try:
@@ -63,14 +79,14 @@ async def rotate_cookies():
         await fetch_and_store_cookie()
         await asyncio.sleep(1800)
 
-async def cookie_txt_file():
-    """Returns the path of the latest cookie file."""
-    await fetch_and_store_cookie()
-    return COOKIE_FILE
+#async def cookie_txt_file():
+#    """Returns the path of the latest cookie file."""
+ #   await fetch_and_store_cookie()
+ #   return COOKIE_FILE
 
 
 
-"""def cookie_txt_file():
+def cookie_txt_file():
     folder_path = f"{os.getcwd()}/cookies"
     filename = f"{os.getcwd()}/cookies/logs.csv"
     txt_files = glob.glob(os.path.join(folder_path, '*.txt'))
@@ -79,7 +95,7 @@ async def cookie_txt_file():
     cookie_txt_file = random.choice(txt_files)
     with open(filename, 'a') as file:
         file.write(f'Choosen File : {cookie_txt_file}\n')
-    """
+    return f"""cookies/{str(cookie_txt_file).split("/")[-1]}"""
 
 
 async def check_file_size(link):
@@ -177,8 +193,8 @@ class YouTubeAPI:
             link = self.base + link
         if "&" in link:
             link = link.split("&")[0]
-        results = await VideosSearch(link, limit=1)
-        for result in results["result"]:
+        results = VideosSearch(link, limit=1)
+        for result in (await results.next())["result"]:
             title = result["title"]
             duration_min = result["duration"]
             thumbnail = result["thumbnails"][0]["url"].split("?")[0]
