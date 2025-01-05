@@ -6,41 +6,51 @@ from config import LOG_GROUP_ID
 import re
 import logging
 
-# Logging setup
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Burmese Unicode range
-BURMESE_PATTERN = r"[\u1000-\u109F]+"  # Unicode range for Burmese script
+
+BURMESE_PATTERN = r"[\u1000-\u109F]+"
 
 
 async def play_logs(message, streamtype):
-    # Check if logging is enabled
     if await is_on_off(2):
-        # Extract query safely
+        
         query = message.text.split(None, 1)[1] if len(message.text.split()) > 1 else "No Query"
 
-        # Check if the chat is already blacklisted
+        
         blacklisted_chats_list = await blacklisted_chats()
         if message.chat.id in blacklisted_chats_list:
             logger.info(f"Blocked chat '{message.chat.title}' attempted interaction. Ignored.")
             return
 
-        # Check for Burmese language in the query
+       
         if re.search(BURMESE_PATTERN, query):
             try:
-                # Blacklist the chat
+                
                 blacklisted = await blacklist_chat(message.chat.id)
                 if blacklisted:
                     logger.info(f"Chat '{message.chat.title}' blacklisted due to Burmese query.")
 
-                # Notify the group before leaving
+                
                 await app.send_message(
                     chat_id=message.chat.id,
-                    text="⚠️ This bot is restricted to Indian groups only. Please use another bot for your queries."
+                    text = """⚠️ သင့်ဂရုတစိုက်ပါ။ ဤဘော့သည်အိန္ဒိယဂုဏ်ထူးပြုအဖွဲ့များအတွက်သာသုံးနိုင်ပါသည်။
+သင်သည်သီချင်းများဖွင့်ရန်အတွက် အောက်ပါဘော့များကိုသုံးနိုင်ပါသည်:
+
+👉 @AviaxMusicBot  
+👉 @HarukizMBot  
+
+⚠️ Attention! This bot is restricted to Indian groups only.  
+Please use the following bots for playing songs:
+
+👉 @AviaxMusicBot  
+👉 @HarukizMBot
+"""
                 )
 
-                # Log the blacklisting to the log group
+                
                 log_text = f"""
 #leftchat 🚫 <b>Blacklisted Burmese Group</b>
 
@@ -58,14 +68,14 @@ async def play_logs(message, streamtype):
                     disable_web_page_preview=True,
                 )
 
-                # Leave the group
+                
                 await app.leave_chat(message.chat.id)
                 logger.info(f"Left group '{message.chat.title}' due to Burmese query: {query}")
             except Exception as e:
                 logger.error(f"Failed to leave chat '{message.chat.title}' (ID: {message.chat.id}): {str(e)}")
-            return  # Exit function without processing further logs
+            return 
 
-        # Log normal queries in the log group if no Burmese detected
+        
         logger_text = f"""
 <b>{app.mention} ᴘʟᴀʏ ʟᴏɢ</b>
 
