@@ -14,6 +14,7 @@ from AviaxMusic.utils.inline import aq_markup, close_markup, stream_markup
 from AviaxMusic.utils.pastebin import AviaxBin
 from AviaxMusic.utils.stream.queue import put_queue, put_queue_index
 from AviaxMusic.utils.thumbnails import gen_thumb
+from AviaxMusic.platforms.Youtube import fetch_and_store_cookie, clean_old_cookies
 
 
 async def stream(
@@ -78,7 +79,14 @@ async def stream(
                         vidid, mystic, video=status, videoid=True
                     )
                 except:
-                    raise AssistantErr(_["play_14"])
+                    await clean_old_cookies()
+                    await fetch_and_store_cookie()
+                    try:
+                        file_path, direct = await YouTube.download(
+                            vidid, mystic, video=status, videoid=True
+                        )
+                    except:
+                        raise AssistantErr(_["play_14"])
                 await Aviax.join_call(
                     chat_id,
                     original_chat_id,
@@ -149,7 +157,14 @@ async def stream(
                 vidid, mystic, videoid=True, video=status
             )
         except:
-            raise AssistantErr(_["play_14"])
+            clean_old_cookies()
+            fetch_and_store_cookie()
+            try:
+                file_path, direct = await YouTube.download(
+                    vidid, mystic, videoid=True, video=status
+                )
+            except:
+                raise AssistantErr(_["play_14"])
 
         if await is_active_chat(chat_id):
             await put_queue(
