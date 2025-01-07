@@ -157,8 +157,8 @@ async def stream(
                 vidid, mystic, videoid=True, video=status
             )
         except:
-            clean_old_cookies()
-            fetch_and_store_cookie()
+            await clean_old_cookies()
+            await fetch_and_store_cookie()
             try:
                 file_path, direct = await YouTube.download(
                     vidid, mystic, videoid=True, video=status
