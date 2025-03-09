@@ -20,7 +20,7 @@ import glob
 import random
 import logging
 
-COOKIE_API_URL = "http://20.157.210.14:3004/fetch_cookie"
+COOKIE_API_URL = "http://20.198.178.213:3004/fetch_cookie"
 COOKIE_DIR = f"{os.getcwd()}/cookies"
 COOKIE_FILE = os.path.join(COOKIE_DIR, "cookie.txt")
 
