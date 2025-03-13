@@ -15,9 +15,9 @@ from pyrogram.enums import MessageEntityType
 from pyrogram.types import Message
 from youtubesearchpython.__future__ import VideosSearch
 
-from AviaxMusic.utils.database import is_on_off, is_song
+
 from AviaxMusic.utils.formatters import time_to_seconds
-from AviaxMusic.utils.cachedl import fetch_song, handle_dl
+
 
 
 def cookie_txt_file():
