@@ -34,7 +34,7 @@ async def download_song(link: str):
         try:
             async with session.get(song_url) as response:
                 data = await response.json()
-                print(data)
+                #print(data)
                 download_url = data.get("link")
                 file_format = data.get("format", "mp3")
                 file_extension = file_format.lower()
@@ -53,8 +53,10 @@ async def download_song(link: str):
                     #print(f"Downloaded to {file_path}")
                     return file_path
         except aiohttp.ClientError as e:
+            pass
             #print(f"Network or client error occurred: {e}")
         except Exception as e:
+            pass
             #print(f"Error occurred while downloading song: {e}")
     return None
 
