@@ -34,7 +34,7 @@ async def download_song(link: str):
         try:
             async with session.get(song_url) as response:
                 data = await response.json()
-                #print(data)
+                print(data)
                 download_url = data.get("link")
                 file_format = data.get("format", "mp3")
                 file_extension = file_format.lower()
@@ -42,7 +42,7 @@ async def download_song(link: str):
                 download_folder = "downloads"
                 os.makedirs(download_folder, exist_ok=True)
                 file_path = os.path.join(download_folder, file_name)
-                #print(f"Download URL: {download_url}") 
+                print(f"Download URL: {download_url}") 
                 async with session.get(download_url) as file_response:
                     with open(file_path, 'wb') as f:
                         while True:
@@ -50,14 +50,14 @@ async def download_song(link: str):
                             if not chunk:
                                 break
                             f.write(chunk)
-                    #print(f"Downloaded to {file_path}")
+                    print(f"Downloaded to {file_path}")
                     return file_path
         except aiohttp.ClientError as e:
-            pass
-            #print(f"Network or client error occurred: {e}")
+            #pass
+            print(f"Network or client error occurred: {e}")
         except Exception as e:
-            pass
-            #print(f"Error occurred while downloading song: {e}")
+            #pass
+            print(f"Error occurred while downloading song: {e}")
     return None
 
 async def check_file_size(link):
