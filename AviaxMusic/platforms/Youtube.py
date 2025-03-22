@@ -54,7 +54,7 @@ async def download_song(link: str):
                     return file_path
         except aiohttp.ClientError as e:
             #print(f"Network or client error occurred: {e}")
-        except Exception as e:
+        #except Exception as e:
             #print(f"Error occurred while downloading song: {e}")
     return None
 
