@@ -31,33 +31,60 @@ async def download_song(link: str):
     video_id = link.split('v=')[-1].split('&')[0]
     song_url = f"{AMBOT}song/{video_id}?api=PiyushR"
     async with aiohttp.ClientSession() as session:
+        # Retry loop to check API status
+        while True:
+            try:
+                async with session.get(song_url) as response:
+                    if response.status != 200:
+                        raise Exception(f"API request failed with status code {response.status}")
+                    data = await response.json()
+                    print(data)  # Debugging ke liye data print kar rahe hain
+
+                    # Status check karo
+                    status = data.get("status", "").lower()
+                    if status == "downloading":
+                        print("Status: downloading, waiting for 2 seconds...")
+                        await asyncio.sleep(2)  # 2 seconds ka sleep
+                        continue  # Retry loop continue karo
+                    elif status == "error":
+                        error_msg = data.get("error") or data.get("message") or "Unknown error"
+                        raise Exception(f"API error: {error_msg}")
+                    elif status == "done":
+                        download_url = data.get("link")
+                        if not download_url:
+                            raise Exception("API response did not provide a download URL.")
+                        break  # Download link mil gaya, loop break karo
+                    else:
+                        raise Exception(f"Unexpected status '{status}' from API.")
+            except Exception as e:
+                print(f"Error while checking API status: {e}")
+                return None  # Error aaya toh None return karo
+
+        # Download link mil gaya, ab file download karo
         try:
-            async with session.get(song_url) as response:
-                data = await response.json()
-                print(data)
-                download_url = data.get("link")
-                file_format = data.get("format", "mp3")
-                file_extension = file_format.lower()
-                file_name = f"{video_id}.{file_extension}"
-                download_folder = "downloads"
-                os.makedirs(download_folder, exist_ok=True)
-                file_path = os.path.join(download_folder, file_name)
-                print(f"Download URL: {download_url}") 
-                async with session.get(download_url) as file_response:
-                    with open(file_path, 'wb') as f:
-                        while True:
-                            chunk = await file_response.content.read(8192)
-                            if not chunk:
-                                break
-                            f.write(chunk)
-                    print(f"Downloaded to {file_path}")
-                    return file_path
+            file_format = data.get("format", "mp3")
+            file_extension = file_format.lower()
+            file_name = f"{video_id}.{file_extension}"
+            download_folder = "downloads"
+            os.makedirs(download_folder, exist_ok=True)
+            file_path = os.path.join(download_folder, file_name)
+            print(f"Download URL: {download_url}")
+
+            async with session.get(download_url) as file_response:
+                with open(file_path, 'wb') as f:
+                    while True:
+                        chunk = await file_response.content.read(8192)
+                        if not chunk:
+                            break
+                        f.write(chunk)
+                print(f"Downloaded to {file_path}")
+                return file_path
         except aiohttp.ClientError as e:
-            #pass
-            print(f"Network or client error occurred: {e}")
+            print(f"Network or client error occurred while downloading: {e}")
+            return None
         except Exception as e:
-            #pass
             print(f"Error occurred while downloading song: {e}")
+            return None
     return None
 
 async def check_file_size(link):
