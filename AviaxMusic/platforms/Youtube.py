@@ -52,11 +52,11 @@ async def download_song(link: str):
                             f.write(chunk)
                     #print(f"Downloaded to {file_path}")
                     return file_path
-        except aiohttp.ClientError as e:
+        #except aiohttp.ClientError as e:
             #print(f"Network or client error occurred: {e}")
         #except Exception as e:
             #print(f"Error occurred while downloading song: {e}")
-    return None
+    #return None
 
 async def check_file_size(link):
     async def get_format_info(link):
