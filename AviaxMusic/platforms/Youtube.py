@@ -38,12 +38,12 @@ async def download_song(link: str):
                     if response.status != 200:
                         raise Exception(f"API request failed with status code {response.status}")
                     data = await response.json()
-                    print(data)  # Debugging ke liye data print kar rahe hain
+                    #print(data)  # Debugging ke liye data print kar rahe hain
 
                     # Status check karo
                     status = data.get("status", "").lower()
                     if status == "downloading":
-                        print("Status: downloading, waiting for 2 seconds...")
+                        #print("Status: downloading, waiting for 2 seconds...")
                         await asyncio.sleep(2)  # 2 seconds ka sleep
                         continue  # Retry loop continue karo
                     elif status == "error":
@@ -68,7 +68,7 @@ async def download_song(link: str):
             download_folder = "downloads"
             os.makedirs(download_folder, exist_ok=True)
             file_path = os.path.join(download_folder, file_name)
-            print(f"Download URL: {download_url}")
+            #print(f"Download URL: {download_url}")
 
             async with session.get(download_url) as file_response:
                 with open(file_path, 'wb') as f:
