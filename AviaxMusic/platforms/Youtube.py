@@ -16,6 +16,7 @@ import random
 import logging
 import aiohttp
 import config
+from config import API_URL, API_KEY
 
 
 def cookie_txt_file():
@@ -26,10 +27,9 @@ def cookie_txt_file():
     return cookie_file
 
 
-AMBOT = "http://s48swsks0cso04ks0k8gwgck.159.223.45.194.sslip.io/"
 async def download_song(link: str):
     video_id = link.split('v=')[-1].split('&')[0]
-    song_url = f"{AMBOT}song/{video_id}?api=PiyushR"
+    song_url = f"{API_URL}/song/{video_id}?api={API_KEY}"
     async with aiohttp.ClientSession() as session:
         # Retry loop to check API status
         while True:
