@@ -29,6 +29,14 @@ def cookie_txt_file():
 
 async def download_song(link: str):
     video_id = link.split('v=')[-1].split('&')[0]
+
+    download_folder = "downloads"
+    for ext in ["mp3", "m4a", "webm"]:
+        file_path = f"{download_folder}/{video_id}.{ext}"
+        if os.path.exists(file_path):
+            print(f"File already exists: {file_path}")
+            return file_path
+
     song_url = f"{API_URL}/song/{video_id}?api={API_KEY}"
     async with aiohttp.ClientSession() as session:
         # Retry loop to check API status
