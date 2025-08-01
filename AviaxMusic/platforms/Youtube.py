@@ -119,7 +119,7 @@ async def download_video(link: str):
                             raise Exception("API response did not provide a download URL.")
                         break
                     elif status == "downloading":
-                        await asyncio.sleep(4)
+                        await asyncio.sleep(8)
                     else:
                         error_msg = data.get("error") or data.get("message") or f"Unexpected status '{status}'"
                         raise Exception(f"API error: {error_msg}")
