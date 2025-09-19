@@ -44,7 +44,7 @@ SUPPORT_GROUP = getenv("SUPPORT_GROUP", "https://t.me/NexGenSpam")
 
 API_URL = getenv("API_URL", 'https://api.thequickearn.xyz')
 VIDEO_API_URL = getenv("VIDEO_API_URL", 'https://api.video.thequickearn.xyz')
-API_KEY = getenv("API_KEY", None)
+API_KEY = getenv("API_KEY", '180DxNexGenBotsl8EE37')
 
 # Set this to True if you want the assistant to automatically leave chats after an interval
 AUTO_LEAVING_ASSISTANT = bool(getenv("AUTO_LEAVING_ASSISTANT", False))
@@ -121,3 +121,4 @@ if SUPPORT_GROUP:
         raise SystemExit(
             "[ERROR] - Your SUPPORT_GROUP url is wrong. Please ensure that it starts with https://"
         )
+
